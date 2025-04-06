@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Control | CLOD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap');
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #0f0f0f;
+            color: white;
+        }
+        .neon-text {
+            text-shadow: 0 0 5px #00f7ff, 0 0 10px #00f7ff;
+        }
+        .request-item {
+            transition: all 0.2s ease;
+        }
+        .request-item:hover {
+            background-color: rgba(0, 247, 255, 0.05);
+        }
+        .status-pending {
+            border-left: 4px solid #f59e0b;
+        }
+        .status-accepted {
+            border-left: 4px solid #10b981;
+        }
+        .status-played {
+            border-left: 4px solid #3b82f6;
+        }
+        .status-rejected {
+            border-left: 4px solid #ef4444;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <header class="bg-black/50 backdrop-blur-sm border-b border-neon/20 py-4 sticky top-0 z-50">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-xl font-bold neon-text">CLOD</h1>
+                <div class="text-neon/80 text-sm">
+                    <i class="fas fa-calendar-alt mr-1"></i>
+                    <span>Friday Night Mix</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="bg-neon/10 text-neon px-3 py-1 rounded-full text-sm">
+                    <i class="fas fa-headphones mr-1"></i>
+                    <span>Live</span>
+                </div>
+                <div class="text-neon">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="text-neon">
+                    <i class="fas fa-user-circle text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Stats Overview -->
+            <div class="lg:col-span-4 grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-black/30 backdrop-blur-sm rounded-lg border border-neon/20 p-4">
+                    <div class="text-neon/80 text-sm">Total Requests</div>
+                    <div class="text-3xl font-bold text-neon mt-1">24</div>
+                </div>
+                <div class="bg-black/30 backdrop-blur-sm rounded-lg border border-neon/20 p-4">
+                    <div class="text-neon/80 text-sm">Pending</div>
+                    <div class="text-3xl font-bold text-amber-400 mt-1">8</div>
+                </div>
+                <div class="bg-black/30 backdrop-blur-sm rounded-lg border border-neon/20 p-4">
+                    <div class="text-neon/80 text-sm">Earnings</div>
+                    <div class="text-3xl font-bold text-emerald-400 mt-1">£86</div>
+                </div>
+                <div class="bg-black/30 backdrop-blur-sm rounded-lg border border-neon/20 p-4">
+                    <div class="text-neon/80 text-sm">Avg. Time</div>
+                    <div class="text-3xl font-bold text-blue-400 mt-1">12m</div>
+                </div>
+            </div>
+
+            <!-- Request Queue -->
+            <div class="lg:col-span-3">
+                <div class="bg-black/30 backdrop-blur-sm rounded-xl border border-neon/20 p-6 shadow-lg shadow-neon/10">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-neon">Request Queue</h2>
+                        <div class="flex space-x-2">
+                            <button class="bg-neon/10 text-neon border border-neon/30 hover:bg-neon/20 px-3 py-1 rounded-lg text-sm transition">
+                                <i class="fas fa-sync-alt mr-1"></i> Refresh
+                            </button>
+                            <button class="bg-neon/10 text-neon border border-neon/30 hover:bg-neon/20 px-3 py-1 rounded-lg text-sm transition">
+                                <i class="fas fa-filter mr-1"></i> Filter
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="request-queue" class="space-y-3">
+                        <!-- Sample Request Items -->
+                        <div class="request-item status-pending bg-black/50 rounded-lg p-4 flex items-start">
+                            <div class="flex-1">
+                                <div class="font-medium">Starboy</div>
+                                <div class="text-sm text-neon/60">The Weeknd, Daft Punk</div>
+                                <div class="mt-2 flex items-center text-sm">
+                                    <span class="bg-amber-400/10 text-amber-400 px-2 py-0.5 rounded mr-2">Pending</span>
+                                    <span class="text-neon/60 mr-2"><i class="fas fa-user mr-1"></i> Mike</span>
+                                    <span class="text-neon/60"><i class="fas fa-pound-sign mr-1"></i>5 (Fast Track)</span>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="request-accept bg-emerald-400/10 text-emerald-400 hover:bg-emerald-400/20 p-2 rounded-lg">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="request-reject bg-red-400/10 text-red-400 hover:bg-red-400/20 p-2 rounded-lg">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="request-item status-accepted bg-black/50 rounded-lg p-4 flex items-start">
+                            <div class="flex-1">
+                                <div class="font-medium">One More Time</div>
+                                <div class="text-sm text-neon/60">Daft Punk</div>
+                                <div class="mt-2 flex items-center text-sm">
+                                    <span class="bg-emerald-400/10 text-emerald-400 px-2 py-0.5 rounded mr-2">Accepted</span>
+                                    <span class="text-neon/60 mr-2"><i class="fas fa-user mr-1"></i> Sarah</span>
+                                    <span class="text-neon/60"><i class="fas fa-pound-sign mr-1"></i>2 (Standard)</span>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="request-play bg-blue-400/10 text-blue-400 hover:bg-blue-400/20 p-2 rounded-lg">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                                <button class="request-reject bg-red-400/10 text-red-400 hover:bg-red-400/20 p-2 rounded-lg">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="request-item status-played bg-black/50 rounded-lg p-4 flex items-start">
+                            <div class="flex-1">
+                                <div class="font-medium">Around the World</div>
+                                <div class="text-sm text-neon/60">Daft Punk</div>
+                                <div class="mt-2 flex items-center text-sm">
+                                    <span class="bg-blue-400/10 text-blue-400 px-2 py-0.5 rounded mr-2">Played</span>
+                                    <span class="text-neon/60 mr-2"><i class="fas fa-user mr-1"></i> Alex</span>
+                                    <span class="text-neon/60"><i class="fas fa-pound-sign mr-1"></i>10 (VIP)</span>
+                                </div>
+                            </div>
+                            <div class="text-neon/60 text-sm">
+                                <i class="fas fa-clock mr-1"></i> 8 minutes ago
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Now Playing & Controls -->
+            <div class="lg:col-span-1 space-y-6">
+                <div class="bg-black/30 backdrop-blur-sm rounded-xl border border-neon/20 p-6 shadow-lg shadow-neon/10">
+                    <h2 class="text-xl font-bold text-neon mb-4">Now Playing</h2>
+                    <div class="text-center">
+                        <div class="w-32 h-32 mx-auto mb-4 bg-gradient-to-br from-neon to-neon-dark rounded-lg flex items-center justify-center">
+                            <i class="fas fa-music text-4xl text-black"></i>
+                        </div>
+                        <div class="font-bold text-neon">Harder Better Faster Stronger</div>
+                        <div class="text-sm text-neon/60 mb-4">Daft Punk</div>
+                        <div class="flex justify-center space-x-4">
+                            <button class="text-neon hover:text-neon-dark text-2xl">
+                                <i class="fas fa-step-backward"></i>
+                            </button>
+                            <button class="text-neon hover:text-neon-dark text-2xl">
+                                <i class="fas fa-pause"></i>
+                            </button>
+                            <button class="text-neon hover:text-neon-dark text-2xl">
+                                <i class="fas fa-step-forward"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-black/30 backdrop-blur-sm rounded-xl border border-neon/20 p-6 shadow-lg shadow-neon/10">
+                    <h2 class="text-xl font-bold text-neon mb-4">Quick Actions</h2>
+                    <div class="space-y-3">
+                        <button class="w-full bg-neon/10 text-neon border border-neon/30 hover:bg-neon/20 py-2 px-4 rounded-lg transition flex items-center justify-center">
+                            <i class="fas fa-qrcode mr-2"></i> Show Event QR
+                        </button>
+                        <button class="w-full bg-neon/10 text-neon border border-neon/30 hover:bg-neon/20 py-2 px-4 rounded-lg transition flex items-center justify-center">
+                            <i class="fas fa-cog mr-2"></i> Event Settings
+                        </button>
+                        <button class="w-full bg-neon/10 text-neon border border-neon/30 hover:bg-neon/20 py-2 px-4 rounded-lg transition flex items-center justify-center">
+                            <i class="fas fa-chart-line mr-2"></i> View Analytics
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="scripts.js"></script>
+    <script>
+        // Make request queue sortable
+        new Sortable(document.getElementById('request-queue'), {
+            animation: 150,
+            handle: '.request-item',
+            ghostClass: 'bg-neon/10'
+        });
+
+        // Request action handlers
+        document.querySelectorAll('.request-accept').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const requestItem = this.closest('.request-item');
+                requestItem.classList.remove('status-pending');
+                requestItem.classList.add('status-accepted');
+                requestItem.querySelector('.bg-amber-400/10').className = 'bg-emerald-400/10 text-emerald-400 px-2 py-0.5 rounded mr-2';
+                requestItem.querySelector('.bg-amber-400/10').textContent = 'Accepted';
+                
+                // Replace accept/reject buttons with play button
+                const actionButtons = requestItem.querySelector('.flex.space-x-2');
+                actionButtons.innerHTML = `
+                    <button class="request-play bg-blue-400/10 text-blue-400 hover:bg-blue-400/20 p-2 rounded-lg">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <button class="request-reject bg-red-400/10 text-red-400 hover:bg-red-400/20 p-2 rounded-lg">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+            });
+        });
+
+        document.querySelectorAll('.request-play').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const requestItem = this.closest('.request-item');
+                requestItem.classList.remove('status-accepted');
+                requestItem.classList.add('status-played');
+                requestItem.querySelector('.bg-emerald-400/10').className = 'bg-blue-400/10 text-blue-400 px-2 py-0.5 rounded mr-2';
+                requestItem.querySelector('.bg-emerald-400/10').textContent = 'Played';
+                
+                // Remove action buttons and add timestamp
+                const actionButtons = requestItem.querySelector('.flex.space-x-2');
+                actionButtons.innerHTML = `
+                    <div class="text-neon/60 text-sm">
+                        <i class="fas fa-clock mr-1"></i> Just now
+                    </div>
+                `;
+            });
+        });
+
+        document.querySelectorAll('.request-reject').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const requestItem = this.closest('.request-item');
+                requestItem.classList.remove('status-pending', 'status-accepted');
+                requestItem.classList.add('status-rejected');
+                const statusBadge = requestItem.querySelector('.bg-amber-400/10, .bg-emerald-400/10');
+                if (statusBadge) {
+                    statusBadge.className = 'bg-red-400/10 text-red-400 px-2 py-0.5 rounded mr-2';
+                    statusBadge.textContent = 'Rejected';
+                }
+                
+                // Remove action buttons
+                const actionButtons = requestItem.querySelector('.flex.space-x-2');
+                actionButtons.innerHTML = `
+                    <div class="text-neon/60 text-sm">
+                        <i class="fas fa-clock mr-1"></i> Just now
+                    </div>
+                `;
+            });
+        });
+    </script>
+</body>
+</html>
