@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Event | CLOD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap');
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #0f0f0f;
+            color: white;
+        }
+        .neon-text {
+            text-shadow: 0 0 5px #00f7ff, 0 0 10px #00f7ff;
+        }
+        #qr-code-container {
+            min-height: 256px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <header class="bg-black/50 backdrop-blur-sm border-b border-neon/20 py-6 sticky top-0 z-50">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold neon-text">CLOD</h1>
+            <nav>
+                <a href="#" class="text-neon hover:text-neon-dark mr-4"><i class="fas fa-user mr-1"></i> Profile</a>
+                <a href="#" class="text-neon hover:text-neon-dark"><i class="fas fa-sign-out-alt mr-1"></i> Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 py-12">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold text-neon mb-8">Create New Event</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Event Details Form -->
+                <div class="bg-black/30 backdrop-blur-sm rounded-xl border border-neon/20 p-6 shadow-lg shadow-neon/10">
+                    <form id="event-form" class="space-y-6">
+                        <div>
+                            <label class="block text-neon/80 mb-2">Event Name</label>
+                            <input type="text" required class="w-full bg-black/50 border border-neon/30 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-neon focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-neon/80 mb-2">Date & Time</label>
+                            <input type="datetime-local" required class="w-full bg-black/50 border border-neon/30 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-neon focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-neon/80 mb-2">Venue</label>
+                            <input type="text" required class="w-full bg-black/50 border border-neon/30 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-neon focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-neon/80 mb-2">Request Pricing</label>
+                            <div class="space-y-4">
+                                <div class="flex items-center">
+                                    <input type="number" min="1" value="2" class="w-20 bg-black/50 border border-neon/30 rounded-lg px-3 py-1 mr-3">
+                                    <span class="text-neon">Standard Request (£)</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="number" min="1" value="5" class="w-20 bg-black/50 border border-neon/30 rounded-lg px-3 py-1 mr-3">
+                                    <span class="text-neon">Fast Track (£)</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="number" min="1" value="10" class="w-20 bg-black/50 border border-neon/30 rounded-lg px-3 py-1 mr-3">
+                                    <span class="text-neon">VIP Request (£)</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="w-full bg-neon hover:bg-neon-dark text-black font-bold py-3 px-4 rounded-lg transition duration-200">
+                            Create Event <i class="fas fa-plus-circle ml-2"></i>
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- QR Code Preview -->
+                <div class="bg-black/30 backdrop-blur-sm rounded-xl border border-neon/20 p-6 shadow-lg shadow-neon/10 flex flex-col">
+                    <h3 class="text-xl font-semibold text-neon mb-4">Event QR Code</h3>
+                    <div id="qr-code-container" class="flex-grow flex items-center justify-center bg-black/50 rounded-lg mb-4">
+                        <p class="text-neon/50 text-center">Event QR code will appear here after creation</p>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button id="download-qr" disabled class="flex-1 bg-neon/10 text-neon border border-neon/30 hover:bg-neon/20 py-2 px-4 rounded-lg transition duration-200">
+                            <i class="fas fa-download mr-2"></i> Download
+                        </button>
+                        <button id="copy-link" disabled class="flex-1 bg-neon/10 text-neon border border-neon/30 hover:bg-neon/20 py-2 px-4 rounded-lg transition duration-200">
+                            <i class="fas fa-copy mr-2"></i> Copy Link
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-black/50 backdrop-blur-sm border-t border-neon/20 py-4">
+        <div class="container mx-auto px-4 text-center text-neon/50 text-sm">
+            © 2023 CLOD - DJ Request System
+        </div>
+    </footer>
+
+    <script src="scripts.js"></script>
+    <script>
+        // Event form submission
+        document.getElementById('event-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Generate sample QR code (will be replaced with actual event URL later)
+            const qr = qrcode(0, 'L');
+            qr.addData('https://clod.app/event/sample123');
+            qr.make();
+            
+            const qrContainer = document.getElementById('qr-code-container');
+            qrContainer.innerHTML = qr.createImgTag(4);
+            qrContainer.querySelector('img').classList.add('mx-auto');
+            
+            // Enable download and copy buttons
+            document.getElementById('download-qr').disabled = false;
+            document.getElementById('copy-link').disabled = false;
+            
+            // TODO: Connect to backend API
+            console.log('Event created successfully');
+        });
+        
+        // Download QR code
+        document.getElementById('download-qr').addEventListener('click', function() {
+            // TODO: Implement actual download functionality
+            alert('QR code download functionality coming soon!');
+        });
+        
+        // Copy event link
+        document.getElementById('copy-link').addEventListener('click', function() {
+            navigator.clipboard.writeText('https://clod.app/event/sample123');
+            alert('Event link copied to clipboard!');
+        });
+    </script>
+</body>
+</html>
