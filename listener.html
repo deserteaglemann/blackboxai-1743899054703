@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Song | CLOD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap');
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #0f0f0f;
+            color: white;
+            background-image: url('https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .neon-text {
+            text-shadow: 0 0 5px #00f7ff, 0 0 10px #00f7ff;
+        }
+        .glass-panel {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 247, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="container mx-auto px-4 py-12 max-w-md">
+        <div class="glass-panel rounded-xl p-8 shadow-lg shadow-neon/20">
+            <!-- Event Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold neon-text mb-2">Friday Night Mix</h1>
+                <p class="text-neon">DJ Neon @ Club Pulse</p>
+                <div class="mt-4 flex justify-center space-x-2">
+                    <span class="px-3 py-1 bg-neon/10 text-neon rounded-full text-sm">House</span>
+                    <span class="px-3 py-1 bg-neon/10 text-neon rounded-full text-sm">Techno</span>
+                    <span class="px-3 py-1 bg-neon/10 text-neon rounded-full text-sm">EDM</span>
+                </div>
+            </div>
+
+            <!-- Request Form -->
+            <form id="request-form" class="space-y-6">
+                <div>
+                    <label class="block text-neon/80 mb-2">Song Request</label>
+                    <div class="relative">
+                        <input type="text" placeholder="Search or type song name" required 
+                            class="w-full bg-black/50 border border-neon/30 rounded-lg px-4 py-3 pl-10 focus:outline-none focus:ring-2 focus:ring-neon focus:border-transparent">
+                        <i class="fas fa-search absolute left-3 top-3.5 text-neon/50"></i>
+                    </div>
+                    <div id="song-results" class="hidden mt-2 max-h-60 overflow-y-auto bg-black/50 rounded-lg border border-neon/20">
+                        <!-- Will be populated with JavaScript -->
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-neon/80 mb-2">Request Type</label>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div>
+                            <input type="radio" name="request-tier" id="standard-tier" value="standard" class="hidden peer" checked>
+                            <label for="standard-tier" class="block p-3 border border-neon/30 rounded-lg peer-checked:border-neon peer-checked:bg-neon/10 cursor-pointer transition">
+                                <span class="block text-center font-medium text-neon">Standard</span>
+                                <span class="block text-center text-2xl font-bold mt-1">£2</span>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" name="request-tier" id="fast-tier" value="fast" class="hidden peer">
+                            <label for="fast-tier" class="block p-3 border border-neon/30 rounded-lg peer-checked:border-neon peer-checked:bg-neon/10 cursor-pointer transition">
+                                <span class="block text-center font-medium text-neon">Fast Track</span>
+                                <span class="block text-center text-2xl font-bold mt-1">£5</span>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" name="request-tier" id="vip-tier" value="vip" class="hidden peer">
+                            <label for="vip-tier" class="block p-3 border border-neon/30 rounded-lg peer-checked:border-neon peer-checked:bg-neon/10 cursor-pointer transition">
+                                <span class="block text-center font-medium text-neon">VIP</span>
+                                <span class="block text-center text-2xl font-bold mt-1">£10</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-neon/80 mb-2">Your Name (Optional)</label>
+                    <input type="text" placeholder="How should DJ announce you?" 
+                        class="w-full bg-black/50 border border-neon/30 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-neon focus:border-transparent">
+                </div>
+
+                <button type="submit" id="pay-button" class="w-full bg-neon hover:bg-neon-dark text-black font-bold py-4 px-4 rounded-lg transition duration-200 flex items-center justify-center">
+                    <i class="fas fa-lock mr-2"></i> Pay & Request
+                </button>
+            </form>
+
+            <div class="mt-6 pt-6 border-t border-neon/20 text-center text-sm text-neon/60">
+                <p>Powered by CLOD - DJ Request System</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Processing Modal -->
+    <div id="payment-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hidden">
+        <div class="glass-panel rounded-xl p-8 max-w-md w-full mx-4">
+            <div class="text-center mb-6">
+                <i class="fas fa-spinner fa-spin text-neon text-4xl mb-4"></i>
+                <h3 class="text-xl font-bold text-neon">Processing Payment</h3>
+                <p class="text-neon/80 mt-2">Please wait while we secure your request...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts.js"></script>
+    <script>
+        // Mock song search results
+        document.querySelector('input[type="text"]').addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase();
+            const results = document.getElementById('song-results');
+            
+            if (query.length > 2) {
+                // Mock data - would be replaced with actual API call
+                const mockSongs = [
+                    { title: "Starboy", artist: "The Weeknd, Daft Punk" },
+                    { title: "One More Time", artist: "Daft Punk" },
+                    { title: "Around the World", artist: "Daft Punk" },
+                    { title: "Harder Better Faster Stronger", artist: "Daft Punk" }
+                ].filter(song => 
+                    song.title.toLowerCase().includes(query) || 
+                    song.artist.toLowerCase().includes(query)
+                );
+
+                if (mockSongs.length > 0) {
+                    results.innerHTML = mockSongs.map(song => `
+                        <div class="p-3 border-b border-neon/10 hover:bg-neon/5 cursor-pointer">
+                            <div class="font-medium">${song.title}</div>
+                            <div class="text-sm text-neon/60">${song.artist}</div>
+                        </div>
+                    `).join('');
+                    results.classList.remove('hidden');
+                } else {
+                    results.innerHTML = '<div class="p-3 text-center text-neon/50">No results found</div>';
+                    results.classList.remove('hidden');
+                }
+            } else {
+                results.classList.add('hidden');
+            }
+        });
+
+        // Handle song selection
+        document.getElementById('song-results').addEventListener('click', function(e) {
+            if (e.target.closest('div').parentElement === this) {
+                const songTitle = e.target.closest('div').querySelector('div:first-child').textContent;
+                document.querySelector('input[type="text"]').value = songTitle;
+                this.classList.add('hidden');
+            }
+        });
+
+        // Form submission
+        document.getElementById('request-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show processing modal
+            document.getElementById('payment-modal').classList.remove('hidden');
+            
+            // Mock payment processing
+            setTimeout(() => {
+                document.getElementById('payment-modal').classList.add('hidden');
+                alert('Payment successful! Your request has been submitted to the DJ.');
+                // In production, this would redirect to Stripe Checkout
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
